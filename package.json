@@ -1,0 +1,29 @@
+{
+	"name": "@codeurs/carousel",
+	"version": "0.0.0",
+	"main": "dist/index.js",
+	"repository": "https://github.com/codeurs/carousel",
+	"author": "Ben Merckx <ben@codeurs.be>",
+	"license": "MIT",
+	"scripts": {
+		"dev": "start-storybook"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.6.4",
+		"@storybook/addon-actions": "^5.2.5",
+		"@storybook/addon-info": "^5.2.5",
+		"@storybook/cli": "^5.2.5",
+		"@storybook/react": "^5.2.5",
+		"@types/jest": "^24.0.19",
+		"awesome-typescript-loader": "^5.2.1",
+		"babel-loader": "^8.0.6",
+		"jest": "^24.9.0",
+		"react-docgen-typescript-loader": "^3.3.0",
+		"react-dom": "^16.11.0",
+		"ts-jest": "^24.1.0",
+		"typescript": "^3.6.4"
+	},
+	"peerDependencies": {
+		"react": "^16.11.0"
+	}
+}
