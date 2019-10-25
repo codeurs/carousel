@@ -42,7 +42,6 @@ stories.add('Simple', () => <SimpleExample />)
 
 const ContainerExample = () => {
 	const carousel = useCarousel()
-	console.log(carousel.isActive(0))
 	return (
 		<div style={{overflow: 'hidden'}}>
 			<div className="container">
