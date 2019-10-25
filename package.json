@@ -15,7 +15,7 @@
 		"src"
 	],
 	"scripts": {
-		"dev": "start-storybook",
+		"dev": "start-storybook --port 8000",
 		"build": "tsc",
 		"pages:build": "build-storybook -c .storybook -o .out",
 		"pages:deploy": "git-directory-deploy --directory .out --branch gh-pages"
@@ -24,6 +24,8 @@
 		"@babel/core": "^7.6.4",
 		"@storybook/addon-actions": "^5.2.5",
 		"@storybook/addon-info": "^5.2.5",
+		"@storybook/addon-knobs": "^5.2.5",
+		"@storybook/addon-notes": "^5.2.5",
 		"@storybook/cli": "^5.2.5",
 		"@storybook/react": "^5.2.5",
 		"@types/deep-equal": "^1.0.1",

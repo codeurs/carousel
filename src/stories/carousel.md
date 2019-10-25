@@ -1,0 +1,3 @@
+```typescript
+const a = 'hello'
+```

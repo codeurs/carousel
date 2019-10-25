@@ -10,6 +10,7 @@ import {value, styler, spring, listen, pointer, calc} from 'popmotion'
 import {Lethargy} from './util/lethargy'
 import {debounce} from 'throttle-debounce'
 import deepEqual from 'deep-equal'
+import {cpus} from 'os'
 
 // Todo:
 // https://www.w3.org/WAI/tutorials/carousels/structure/
@@ -22,11 +23,15 @@ type CarouselOptions = {
 	power?: number
 }
 
+type IsActive = (childIndex: number) => boolean
+
 type Carousel = {
 	current: number
 	setCurrent: (page: number) => void
 	total: number
 	setTotal: (amount: number) => void
+	isActive: IsActive
+	setIsActive: (update: () => IsActive) => void
 } & CarouselOptions
 
 type Snaps = {pages: Array<number>; elements: Array<number>}
@@ -34,6 +39,13 @@ type Snaps = {pages: Array<number>; elements: Array<number>}
 export const useCarousel = (options?: CarouselOptions) => {
 	const [current, setCurrent] = useState(0)
 	const [total, setTotal] = useState(0)
+	const isActiveRef = useRef<IsActive | null>(null)
+	const isActive = (childIndex: number) => {
+		if (isActiveRef.current) return isActiveRef.current(childIndex)
+		return false
+	}
+	const setIsActive = (update: () => IsActive) =>
+		(isActiveRef.current = update())
 	const has = (index: number) => index >= 0 && index < total
 	const hasNext = () => has(current + 1)
 	const hasPrevious = () => has(current - 1)
@@ -42,9 +54,6 @@ export const useCarousel = (options?: CarouselOptions) => {
 	}
 	const goNext = () => goTo(current + 1)
 	const goPrevious = () => goTo(current - 1)
-	const isActive = (childIndex: number) => {
-		console.log('todo')
-	}
 	return {
 		current,
 		setCurrent,
@@ -57,6 +66,7 @@ export const useCarousel = (options?: CarouselOptions) => {
 		goNext,
 		goPrevious,
 		isActive,
+		setIsActive,
 		...options
 	}
 }
@@ -107,7 +117,11 @@ const snapToAnimation = (options: {
 }
 
 export const Carousel: FunctionComponent<
-	Carousel & CarouselOptions & {className?: string | {toString: () => string}}
+	Carousel &
+		CarouselOptions & {
+			className?: string | {toString: () => string}
+			full?: boolean
+		}
 > = ({
 	className,
 	children,
@@ -115,9 +129,11 @@ export const Carousel: FunctionComponent<
 	setCurrent,
 	total,
 	setTotal,
+	setIsActive,
 	snapTo = 'pages',
 	tug = 0.4,
-	power = 0.25
+	power = 0.25,
+	full = false
 }) => {
 	const dom = useRef<HTMLDivElement>(null)
 	const offset = useMemo(() => value(0), [])
@@ -125,8 +141,6 @@ export const Carousel: FunctionComponent<
 	const widthRef = useRef(0)
 	const preventClick = useRef(false)
 	const activePage = useRef(0)
-	const currentRef = useRef(current)
-	currentRef.current = current
 
 	const content = () => dom.current!.firstChild! as HTMLDivElement
 	const max = () => content().scrollWidth - dom.current!.offsetWidth
@@ -139,12 +153,14 @@ export const Carousel: FunctionComponent<
 		snapsRef.current = newSnaps
 		const {pages} = newSnaps
 		// jump to current page
-		spring(pages[currentRef.current])
+		spring(pages[activePage.current])
 	}, [])
 
 	const setActivePage = useCallback((destination: number) => {
 		const {pages} = snapsRef.current
-		setCurrent(pages.indexOf(closest(pages, destination)))
+		const newPage = pages.indexOf(closest(pages, destination))
+		activePage.current = newPage
+		setCurrent(newPage)
 	}, [])
 
 	const spring = useCallback(
@@ -169,7 +185,6 @@ export const Carousel: FunctionComponent<
 	useEffect(() => {
 		const pageWidth = dom.current!.offsetWidth
 		const pageChange = activePage.current !== current
-		if (!pageChange && pageWidth === widthRef.current) return
 		widthRef.current = pageWidth
 		activePage.current = current
 		update(pageChange)
@@ -261,6 +276,16 @@ export const Carousel: FunctionComponent<
 		window.addEventListener('resize', onResize)
 		const clearResize = () => window.removeEventListener('resize', onResize)
 
+		setIsActive(() => (childIndex: number) => {
+			const current = activePage.current
+			const {pages, elements} = snapsRef.current
+			const pos = elements[childIndex]
+			const next = elements[childIndex + 1]
+			const page = pages[current]
+			const nextPage = pages[current + 1] || Infinity
+			return pos >= page && next - 5 <= nextPage
+		})
+
 		return () => {
 			clearSubscription()
 			clearMove()
@@ -275,7 +300,7 @@ export const Carousel: FunctionComponent<
 		<div
 			ref={dom}
 			style={{
-				overflow: 'hidden',
+				overflow: full ? undefined : 'hidden',
 				height: '100%',
 				width: '100%',
 				userSelect: 'none',
