@@ -6,7 +6,7 @@ import {withInfo} from '@storybook/addon-info'
 import {action} from '@storybook/addon-actions'
 import {Carousel, useCarousel} from '..'
 import notes from './carousel.md'
-import {text, boolean, number} from '@storybook/addon-knobs'
+import {text, boolean, number, select} from '@storybook/addon-knobs'
 
 const stories = storiesOf('Carousel', module)
 
@@ -22,18 +22,20 @@ const SimpleExample = () => {
 		<div>
 			<Carousel {...carousel} className="carousel">
 				{Array.from(Array(slides)).map((_, i) => (
-					<div className="slide" key={i}>
+					<div
+						className={`slide ${carousel.isActive(i) ? 'is-active' : ''}`}
+						key={i}
+					>
 						{i + 1}
 					</div>
 				))}
 			</Carousel>
-			Total pages: {carousel.total}
-			<br />
-			Current page: {carousel.current}
-			<br />
-			<button onClick={() => carousel.goPrevious()}>Previous</button>
-			<br />
-			<button onClick={() => carousel.goNext()}>Next</button>
+			<div className="options">
+				<div>Total pages: {carousel.total}</div>
+				<div>Current page: {carousel.current}</div>
+				<button onClick={() => carousel.goPrevious()}>Previous</button>
+				<button onClick={() => carousel.goNext()}>Next</button>
+			</div>
 		</div>
 	)
 }
@@ -41,7 +43,15 @@ const SimpleExample = () => {
 stories.add('Simple', () => <SimpleExample />)
 
 const ContainerExample = () => {
-	const carousel = useCarousel()
+	const snapTo = select(
+		'Snap to',
+		{
+			Pages: 'pages',
+			Elements: 'elements'
+		},
+		'pages'
+	)
+	const carousel = useCarousel({snapTo})
 	return (
 		<div style={{overflow: 'hidden'}}>
 			<div className="container">
@@ -61,14 +71,6 @@ const ContainerExample = () => {
 	)
 }
 
-stories.add(
-	'In container',
-	() => (
-		<div>
-			<ContainerExample />
-		</div>
-	),
-	{
-		notes: {markdown: notes}
-	}
-)
+stories.add('In container', () => <ContainerExample />, {
+	notes: {markdown: notes}
+})

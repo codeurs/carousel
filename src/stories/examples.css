@@ -36,6 +36,12 @@ body {
 	justify-content: center;
 	color: rgb(150, 150, 150);
 	font-size: 80px;
+	transition: opacity 0.7s ease-out;
+}
+
+.slide.is-active {
+	opacity: 1;
+	color: black;
 }
 
 .card {
@@ -47,4 +53,13 @@ body {
 
 .card.is-active {
 	opacity: 1;
+}
+
+.options {
+	display: flex;
+	padding: 20px 0;
+}
+
+.options > * {
+	margin-right: 20px;
 }
