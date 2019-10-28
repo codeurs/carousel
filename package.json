@@ -19,11 +19,10 @@
 		"build": "tsc",
 		"deploy": "yarn -s build && yarn -s pages:build && yarn publish && yarn -s pages:deploy",
 		"pages:build": "build-storybook -c .storybook -o .out",
-		"pages:deploy": "gdd --src .out --branch gh-pages"
+		"pages:deploy": "git-directory-deploy --directory .out --branch gh-pages"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.6.4",
-		"@hswolff/git-directory-deploy": "^0.6.1",
 		"@storybook/addon-actions": "^5.2.5",
 		"@storybook/addon-info": "^5.2.5",
 		"@storybook/addon-knobs": "^5.2.5",
@@ -36,6 +35,7 @@
 		"@types/throttle-debounce": "^2.1.0",
 		"awesome-typescript-loader": "^5.2.1",
 		"babel-loader": "^8.0.6",
+		"git-directory-deploy": "^1.5.1",
 		"jest": "^24.9.0",
 		"react-docgen-typescript-loader": "^3.3.0",
 		"react-dom": "^16.11.0",
