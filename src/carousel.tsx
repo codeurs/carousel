@@ -1,16 +1,11 @@
-import React, {
-	useState,
-	useMemo,
-	useRef,
-	FunctionComponent,
-	useEffect,
-	useCallback
-} from 'react'
-import {value, styler, spring, listen, pointer, calc} from 'popmotion'
-import {Lethargy} from './util/lethargy'
-import {debounce} from 'throttle-debounce'
 import deepEqual from 'deep-equal'
 import {cpus} from 'os'
+import {calc, listen, pointer, spring, styler, value} from 'popmotion'
+import React, {
+	FunctionComponent, useCallback, useEffect, useMemo, useRef, useState
+} from 'react'
+import {debounce} from 'throttle-debounce'
+import {Lethargy} from './util/lethargy'
 
 // Todo:
 // https://www.w3.org/WAI/tutorials/carousels/structure/
@@ -121,13 +116,11 @@ const snapToAnimation = (options: {
 	})
 }
 
-export const Carousel: FunctionComponent<
-	Carousel &
-		CarouselOptions & {
-			className?: string | {toString: () => string}
-			full?: boolean
-		}
-> = ({
+export const Carousel: FunctionComponent<Carousel &
+	CarouselOptions & {
+		className?: string | {toString: () => string}
+		full?: boolean
+	}> = ({
 	className,
 	children,
 	current,
@@ -165,7 +158,10 @@ export const Carousel: FunctionComponent<
 
 	const setActivePage = useCallback((destination: number) => {
 		const {pages} = snapsRef.current
-		const newPage = pages.indexOf(closest(pages, destination))
+		const newPage =
+			destination === max()
+				? pages.length - 1
+				: pages.indexOf(closest(pages, destination))
 		activePage.current = newPage
 		setCurrent(newPage)
 	}, [])
@@ -237,10 +233,7 @@ export const Carousel: FunctionComponent<
 					x: start,
 					preventDefault: false
 				})
-					.pipe(
-						(pos: {x: number}) => pos.x,
-						overDrag
-					)
+					.pipe((pos: {x: number}) => pos.x, overDrag)
 					.start(offset).stop
 				listen(document, 'mouseup touchend', {once: true}).start(() =>
 					snapToPoint(start)

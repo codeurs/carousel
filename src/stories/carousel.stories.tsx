@@ -1,12 +1,12 @@
 import './examples.css'
 
-import React, {useRef} from 'react'
-import {storiesOf} from '@storybook/react'
-import {withInfo} from '@storybook/addon-info'
 import {action} from '@storybook/addon-actions'
-import {Carousel, useCarousel} from '..'
+import {withInfo} from '@storybook/addon-info'
+import {boolean, number, select, text} from '@storybook/addon-knobs'
+import {storiesOf} from '@storybook/react'
+import React, {useRef} from 'react'
+import {Carousel, useCarousel} from '../'
 import notes from './carousel.md'
-import {text, boolean, number, select} from '@storybook/addon-knobs'
 
 const stories = storiesOf('Carousel', module)
 
@@ -74,3 +74,25 @@ const ContainerExample = () => {
 stories.add('In container', () => <ContainerExample />, {
 	notes: {markdown: notes}
 })
+
+const VariableWidth = () => {
+	const carousel = useCarousel()
+	return (
+		<div>
+			<Carousel {...carousel} className="carousel">
+				<div className="slide is-active">1</div>
+				<div className="slide is-active" style={{minWidth: '25%'}}>
+					2
+				</div>
+			</Carousel>
+			<div className="options">
+				<div>Total pages: {carousel.total}</div>
+				<div>Current page: {carousel.current}</div>
+				<button onClick={() => carousel.goPrevious()}>Previous</button>
+				<button onClick={() => carousel.goNext()}>Next</button>
+			</div>
+		</div>
+	)
+}
+
+stories.add('Variable Width', () => <VariableWidth />)
