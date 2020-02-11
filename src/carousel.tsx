@@ -151,8 +151,6 @@ export const Carousel: FunctionComponent<Carousel &
 	const max = () => content().scrollWidth - dom.current!.offsetWidth
 
 	const update = useCallback((force?: boolean) => {
-		// This might have been called after
-		if (!dom.current) return
 		const snaps = snapsRef.current
 		const newSnaps = calcSnaps(dom.current!)
 		if (!force && deepEqual(snaps, newSnaps)) return
