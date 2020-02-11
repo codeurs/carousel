@@ -2,7 +2,12 @@ import deepEqual from 'deep-equal'
 import {cpus} from 'os'
 import {calc, listen, pointer, spring, styler, value} from 'popmotion'
 import React, {
-	FunctionComponent, useCallback, useEffect, useMemo, useRef, useState
+	FunctionComponent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState
 } from 'react'
 import {debounce} from 'throttle-debounce'
 import {Lethargy} from './util/lethargy'
@@ -146,6 +151,8 @@ export const Carousel: FunctionComponent<Carousel &
 	const max = () => content().scrollWidth - dom.current!.offsetWidth
 
 	const update = useCallback((force?: boolean) => {
+		// This might have been called after
+		if (!dom.current) return
 		const snaps = snapsRef.current
 		const newSnaps = calcSnaps(dom.current!)
 		if (!force && deepEqual(snaps, newSnaps)) return
@@ -293,6 +300,7 @@ export const Carousel: FunctionComponent<Carousel &
 			clearTrack()
 			clearClick()
 			clearWheel()
+			onResize.cancel()
 			clearResize()
 		}
 	}, [])
