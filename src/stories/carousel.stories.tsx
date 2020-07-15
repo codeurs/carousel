@@ -56,7 +56,7 @@ const ContainerExample = () => {
 		<div style={{overflow: 'hidden'}}>
 			<div className="container">
 				<Carousel {...carousel} full className="carousel">
-					{Array.from(Array(30)).map((_, i) => (
+					{Array.from(Array(4)).map((_, i) => (
 						<div
 							className={`card ${carousel.isActive(i) ? 'is-active' : ''}`}
 							key={i}

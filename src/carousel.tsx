@@ -154,7 +154,6 @@ export const Carousel: FunctionComponent<
 		const snaps = snapsRef.current
 		const newSnaps = calcSnaps(dom.current!)
 		if (!force && snapKey(snaps) === snapKey(newSnaps)) return
-		console.log('here')
 		setTotal(Math.ceil(newSnaps.pages.length))
 		snapsRef.current = newSnaps
 		const {pages} = newSnaps
