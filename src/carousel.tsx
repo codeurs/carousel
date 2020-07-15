@@ -1,13 +1,6 @@
-import deepEqual from 'deep-equal'
-import {cpus} from 'os'
 import {calc, listen, pointer, spring, styler, value} from 'popmotion'
 import React, {
-	FunctionComponent,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState
+	FunctionComponent, useCallback, useEffect, useMemo, useRef, useState
 } from 'react'
 import {debounce} from 'throttle-debounce'
 import {Lethargy} from './util/lethargy'
@@ -84,7 +77,7 @@ const calcSnaps = (dom: HTMLDivElement) => {
 		({pages, elements}, child, i) => {
 			const prevPage = pages[pages.length - 1]
 			const prevElement = elements[elements.length - 1]
-			const width = child.offsetWidth
+			const width = child.getBoundingClientRect().width
 			const offset = prevElement + width
 			elements.push(offset)
 			if (
@@ -121,11 +114,13 @@ const snapToAnimation = (options: {
 	})
 }
 
-export const Carousel: FunctionComponent<Carousel &
-	CarouselOptions & {
-		className?: string | {toString: () => string}
-		full?: boolean
-	}> = ({
+export const Carousel: FunctionComponent<
+	Carousel &
+		CarouselOptions & {
+			className?: string | {toString: () => string}
+			full?: boolean
+		}
+> = ({
 	className,
 	children,
 	current,
@@ -150,10 +145,16 @@ export const Carousel: FunctionComponent<Carousel &
 	const content = () => dom.current!.firstChild! as HTMLDivElement
 	const max = () => content().scrollWidth - dom.current!.offsetWidth
 
+	const snapKey = (snaps: Snaps) =>
+		snaps.pages.map(Math.round).join('.') +
+		'|' +
+		snaps.elements.map(Math.round).join('.')
+
 	const update = useCallback((force?: boolean) => {
 		const snaps = snapsRef.current
 		const newSnaps = calcSnaps(dom.current!)
-		if (!force && deepEqual(snaps, newSnaps)) return
+		if (!force && snapKey(snaps) === snapKey(newSnaps)) return
+		console.log('here')
 		setTotal(Math.ceil(newSnaps.pages.length))
 		snapsRef.current = newSnaps
 		const {pages} = newSnaps
@@ -238,7 +239,10 @@ export const Carousel: FunctionComponent<Carousel &
 					x: start,
 					preventDefault: false
 				})
-					.pipe((pos: {x: number}) => pos.x, overDrag)
+					.pipe(
+						(pos: {x: number}) => pos.x,
+						overDrag
+					)
 					.start(offset).stop
 				listen(document, 'mouseup touchend', {once: true}).start(() =>
 					snapToPoint(start)
