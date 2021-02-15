@@ -1,6 +1,11 @@
 import {calc, listen, pointer, spring, styler, value} from 'popmotion'
 import React, {
-	FunctionComponent, useCallback, useEffect, useMemo, useRef, useState
+	FunctionComponent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState
 } from 'react'
 import {debounce} from 'throttle-debounce'
 import {Lethargy} from './util/lethargy'
@@ -238,10 +243,7 @@ export const Carousel: FunctionComponent<
 					x: start,
 					preventDefault: false
 				})
-					.pipe(
-						(pos: {x: number}) => pos.x,
-						overDrag
-					)
+					.pipe((pos: {x: number}) => pos.x, overDrag)
 					.start(offset).stop
 				listen(document, 'mouseup touchend', {once: true}).start(() =>
 					snapToPoint(start)
@@ -275,11 +277,14 @@ export const Carousel: FunctionComponent<
 		}
 
 		dom.current!.addEventListener('click', onClick, true)
-		const clearClick = () =>
-			dom.current!.removeEventListener('click', onClick, true)
+		const clearClick = () => {
+			if (dom.current) dom.current!.removeEventListener('click', onClick, true)
+		}
 
 		dom.current!.addEventListener('wheel', onWheel)
-		const clearWheel = () => dom.current!.removeEventListener('wheel', onWheel)
+		const clearWheel = () => {
+			if (dom.current) dom.current!.removeEventListener('wheel', onWheel)
+		}
 
 		const onResize = debounce(250, () => update())
 
@@ -320,7 +325,7 @@ export const Carousel: FunctionComponent<
 		>
 			<div
 				style={{height: '100%', display: 'flex'}}
-				onDragStart={e => e.preventDefault()}
+				onDragStart={(e) => e.preventDefault()}
 			>
 				{children}
 			</div>
