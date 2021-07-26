@@ -178,6 +178,7 @@ export const Carousel: FunctionComponent<
 
 	const spring = useCallback(
 		(destination: number, animate = snapToAnimation) => {
+			if (!dom.current) return
 			const from = offset.get() as number
 			const to = -Math.min(destination, max())
 			setActivePage(-to)
@@ -243,7 +244,10 @@ export const Carousel: FunctionComponent<
 					x: start,
 					preventDefault: false
 				})
-					.pipe((pos: {x: number}) => pos.x, overDrag)
+					.pipe(
+						(pos: {x: number}) => pos.x,
+						overDrag
+					)
 					.start(offset).stop
 				listen(document, 'mouseup touchend', {once: true}).start(() =>
 					snapToPoint(start)
@@ -325,7 +329,7 @@ export const Carousel: FunctionComponent<
 		>
 			<div
 				style={{height: '100%', display: 'flex'}}
-				onDragStart={(e) => e.preventDefault()}
+				onDragStart={e => e.preventDefault()}
 			>
 				{children}
 			</div>
