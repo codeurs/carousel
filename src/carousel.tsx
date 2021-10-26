@@ -80,7 +80,7 @@ export const useCarousel = (options?: CarouselOptions) => {
 
 const mix = calc.getValueFromProgress
 
-const MY_RETINA_FIXING_MAGIC_NUMBER = 5
+const MY_RETINA_FIXING_MAGIC_NUMBER = 3
 
 const calcSnaps = (dom: HTMLDivElement) => {
 	const pageWidth = dom.offsetWidth
@@ -314,8 +314,8 @@ export const Carousel: FunctionComponent<
 			const next = Math.round(elements[childIndex + 1])
 			const page = target.current
 			const nextPage = target.current + widthRef.current
-			if (pos < page) return 'left'
-			if (next > nextPage) return 'right'
+			if (pos + MY_RETINA_FIXING_MAGIC_NUMBER < page) return 'left'
+			if (next - MY_RETINA_FIXING_MAGIC_NUMBER > nextPage) return 'right'
 			return 'active'
 		})
 
