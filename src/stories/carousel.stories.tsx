@@ -1,12 +1,8 @@
-import './examples.css'
-
-import {action} from '@storybook/addon-actions'
-import {withInfo} from '@storybook/addon-info'
-import {boolean, number, select, text} from '@storybook/addon-knobs'
+import {number, select} from '@storybook/addon-knobs'
 import {storiesOf} from '@storybook/react'
-import React, {useRef} from 'react'
-import {Carousel, useCarousel} from '../'
-import notes from './carousel.md'
+import React from 'react'
+import {Carousel, useCarousel} from '../carousel'
+import './examples.css'
 
 const stories = storiesOf('Carousel', module)
 
@@ -22,10 +18,7 @@ const SimpleExample = () => {
 		<div>
 			<Carousel {...carousel} className="carousel">
 				{Array.from(Array(slides)).map((_, i) => (
-					<div
-						className={`slide ${carousel.isActive(i) ? 'is-active' : ''}`}
-						key={i}
-					>
+					<div className={`slide is-${carousel.getPosition(i)}`} key={i}>
 						{i + 1}
 					</div>
 				))}
@@ -56,29 +49,35 @@ const ContainerExample = () => {
 		<div style={{overflow: 'hidden'}}>
 			<div className="container">
 				<Carousel {...carousel} full className="carousel">
-					{Array.from(Array(26)).map((_, i) => (
+					{Array.from(Array(5)).map((_, i) => (
 						<div className={`card is-${carousel.getPosition(i)}`} key={i}>
 							<div className="slide">{i + 1}</div>
 						</div>
 					))}
 				</Carousel>
-				Active page: {carousel.current}
+				<div className="options">
+					<div>Total pages: {carousel.total}</div>
+					<div>Current page: {carousel.current}</div>
+					<button onClick={() => carousel.goPrevious()}>Previous</button>
+					<button onClick={() => carousel.goNext()}>Next</button>
+				</div>
 			</div>
 		</div>
 	)
 }
 
-stories.add('In container', () => <ContainerExample />, {
-	notes: {markdown: notes}
-})
+stories.add('In container', () => <ContainerExample />)
 
 const VariableWidth = () => {
 	const carousel = useCarousel()
 	return (
 		<div>
 			<Carousel {...carousel} className="carousel">
-				<div className="slide is-active">1</div>
-				<div className="slide is-active" style={{minWidth: '25%'}}>
+				<div className={`slide is-${carousel.getPosition(0)}`}>1</div>
+				<div
+					className={`slide is-${carousel.getPosition(1)}`}
+					style={{minWidth: '25%'}}
+				>
 					2
 				</div>
 			</Carousel>

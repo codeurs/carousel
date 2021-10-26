@@ -1,3 +1,0 @@
-```typescript
-const a = 'hello'
-```
