@@ -21,7 +21,8 @@ type CarouselOptions = {
 	power?: number
 }
 
-type IsActive = (page: number, childIndex: number) => boolean
+type SlidePosition = undefined | 'left' | 'active' | 'right'
+type GetPosition = (page: number, childIndex: number) => SlidePosition
 
 type Carousel = {
 	current: number
@@ -29,7 +30,8 @@ type Carousel = {
 	total: number
 	setTotal: (amount: number) => void
 	isActive: (childIndex: number) => boolean
-	setIsActive: (update: () => IsActive) => void
+	getPosition: (childIndex: number) => SlidePosition
+	setGetPosition: (update: () => GetPosition) => void
 } & CarouselOptions
 
 type Snaps = {pages: Array<number>; elements: Array<number>}
@@ -37,12 +39,16 @@ type Snaps = {pages: Array<number>; elements: Array<number>}
 export const useCarousel = (options?: CarouselOptions) => {
 	const [current, setCurrent] = useState(0)
 	const [total, setTotal] = useState(0)
-	const isActiveRef = useRef<IsActive | null>(null)
+	const isActiveRef = useRef<GetPosition | null>(null)
 	const isActive = (childIndex: number) => {
-		if (isActiveRef.current) return isActiveRef.current(current, childIndex)
+		if (isActiveRef.current)
+			return isActiveRef.current(current, childIndex) === 'active'
 		return false
 	}
-	const setIsActive = (update: () => IsActive) =>
+	const getPosition = (childIndex: number) => {
+		if (isActiveRef.current) return isActiveRef.current(current, childIndex)
+	}
+	const setGetPosition = (update: () => GetPosition) =>
 		(isActiveRef.current = update())
 	const has = (index: number) => index >= 0 && index < total
 	const hasNext = () => has(current + 1)
@@ -64,7 +70,8 @@ export const useCarousel = (options?: CarouselOptions) => {
 		goNext,
 		goPrevious,
 		isActive,
-		setIsActive,
+		getPosition,
+		setGetPosition,
 		...options
 	}
 }
@@ -132,7 +139,7 @@ export const Carousel: FunctionComponent<
 	setCurrent,
 	total,
 	setTotal,
-	setIsActive,
+	setGetPosition,
 	snapTo = 'pages',
 	tug = 0.4,
 	power = 0.25,
@@ -140,6 +147,7 @@ export const Carousel: FunctionComponent<
 }) => {
 	const dom = useRef<HTMLDivElement>(null)
 	const offset = useMemo(() => value(0), [])
+	const target = useRef(0)
 	const snapsRef = useRef<Snaps>({pages: [0], elements: [0]})
 	const widthRef = useRef(0)
 	const preventClick = useRef(false)
@@ -181,6 +189,7 @@ export const Carousel: FunctionComponent<
 			if (!dom.current) return
 			const from = offset.get() as number
 			const to = -Math.min(destination, max())
+			target.current = to
 			setActivePage(-to)
 			if (from === to) return
 			animate({from, to, velocity: offset.getVelocity()}).start(offset)
@@ -264,7 +273,7 @@ export const Carousel: FunctionComponent<
 		const lethargy = new Lethargy()
 		let wheelPanning = false
 
-		const onWheel = (e: MouseWheelEvent) => {
+		const onWheel = (e: WheelEvent) => {
 			const angle = calc.angle({
 				x: e.deltaX,
 				y: e.deltaY
@@ -295,13 +304,15 @@ export const Carousel: FunctionComponent<
 		window.addEventListener('resize', onResize)
 		const clearResize = () => window.removeEventListener('resize', onResize)
 
-		setIsActive(() => (current: number, childIndex: number) => {
+		setGetPosition(() => (current: number, childIndex: number) => {
 			const {pages, elements} = snapsRef.current
 			const pos = elements[childIndex]
 			const next = elements[childIndex + 1]
-			const page = pages[current]
-			const nextPage = pages[current + 1] || Infinity
-			return pos >= page && next - MY_RETINA_FIXING_MAGIC_NUMBER <= nextPage
+			const page = -target.current
+			const nextPage = -target.current + widthRef.current
+			if (pos < page) return 'left'
+			if (next - MY_RETINA_FIXING_MAGIC_NUMBER > nextPage) return 'right'
+			return 'active'
 		})
 
 		return () => {

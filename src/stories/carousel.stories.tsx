@@ -56,11 +56,8 @@ const ContainerExample = () => {
 		<div style={{overflow: 'hidden'}}>
 			<div className="container">
 				<Carousel {...carousel} full className="carousel">
-					{Array.from(Array(4)).map((_, i) => (
-						<div
-							className={`card ${carousel.isActive(i) ? 'is-active' : ''}`}
-							key={i}
-						>
+					{Array.from(Array(26)).map((_, i) => (
+						<div className={`card is-${carousel.getPosition(i)}`} key={i}>
 							<div className="slide">{i + 1}</div>
 						</div>
 					))}

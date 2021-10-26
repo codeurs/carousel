@@ -55,6 +55,13 @@ body {
 	opacity: 1;
 }
 
+.card.is-left {
+	background: red;
+}
+.card.is-right {
+	background: blue;
+}
+
 .options {
 	display: flex;
 	padding: 20px 0;
