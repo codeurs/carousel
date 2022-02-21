@@ -68,6 +68,43 @@ const ContainerExample = () => {
 
 stories.add('In container', () => <ContainerExample />)
 
+const ResponsiveExample = () => {
+	console.log('draw here')
+	const snapTo = select(
+		'Snap to',
+		{
+			Pages: 'pages',
+			Elements: 'elements'
+		},
+		'pages'
+	)
+	const carousel = useCarousel({snapTo})
+	return (
+		<div style={{overflow: 'hidden'}}>
+			<div className="container">
+				<Carousel {...carousel} full className="carousel">
+					{Array.from(Array(5)).map((_, i) => (
+						<div
+							className={`card is-responsive is-${carousel.getPosition(i)}`}
+							key={i}
+						>
+							<div className="slide">{i + 1}</div>
+						</div>
+					))}
+				</Carousel>
+				<div className="options">
+					<div>Total pages: {carousel.total}</div>
+					<div>Current page: {carousel.current}</div>
+					<button onClick={() => carousel.goPrevious()}>Previous</button>
+					<button onClick={() => carousel.goNext()}>Next</button>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+stories.add('Responsive', () => <ResponsiveExample />)
+
 const VariableWidth = () => {
 	const carousel = useCarousel()
 	return (

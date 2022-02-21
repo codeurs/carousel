@@ -51,6 +51,12 @@ body {
 	transition: opacity 0.7s ease-out;
 }
 
+@media (max-width: 768px) {
+	.card.is-responsive {
+		min-width: 25%;
+	}
+}
+
 .card.is-active {
 	opacity: 1;
 }

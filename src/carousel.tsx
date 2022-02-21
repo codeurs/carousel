@@ -37,6 +37,8 @@ type Carousel = {
 type Snaps = {pages: Array<number>; elements: Array<number>}
 
 export const useCarousel = (options?: CarouselOptions) => {
+	const [, gen] = useState(0)
+	const forceUpdate = useCallback(() => gen(x => x + 1), [gen])
 	const [current, setCurrent] = useState(0)
 	const [total, setTotal] = useState(0)
 	const target = useRef(0)
@@ -61,7 +63,10 @@ export const useCarousel = (options?: CarouselOptions) => {
 	const goPrevious = () => goTo(current - 1)
 	return {
 		current,
-		setCurrent,
+		setCurrent: current => {
+			setCurrent(current)
+			forceUpdate()
+		},
 		target,
 		total,
 		setTotal,
@@ -301,7 +306,7 @@ export const Carousel: FunctionComponent<
 			if (dom.current) dom.current!.removeEventListener('wheel', onWheel)
 		}
 
-		const onResize = debounce(250, () => update())
+		const onResize = debounce(25, () => update())
 
 		window.addEventListener('resize', onResize)
 		const clearResize = () => window.removeEventListener('resize', onResize)
@@ -313,10 +318,14 @@ export const Carousel: FunctionComponent<
 			const pos = Math.round(elements[childIndex])
 			const next = Math.round(elements[childIndex + 1])
 			const page = target.current
-			const nextPage = target.current + widthRef.current
-			if (pos + MY_RETINA_FIXING_MAGIC_NUMBER < page) return 'left'
-			if (next - MY_RETINA_FIXING_MAGIC_NUMBER > nextPage) return 'right'
-			return 'active'
+			const nextPage = target.current + dom.current!.offsetWidth
+			const res =
+				pos + MY_RETINA_FIXING_MAGIC_NUMBER < page
+					? 'left'
+					: next - MY_RETINA_FIXING_MAGIC_NUMBER > nextPage
+					? 'right'
+					: 'active'
+			return res
 		})
 
 		return () => {
