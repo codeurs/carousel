@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState
 } from 'react'
-import {debounce} from 'throttle-debounce'
+import {throttle} from 'throttle-debounce'
 import {Lethargy} from './util/lethargy'
 
 // Todo:
@@ -306,7 +306,7 @@ export const Carousel: FunctionComponent<
 			if (dom.current) dom.current!.removeEventListener('wheel', onWheel)
 		}
 
-		const onResize = debounce(25, () => update())
+		const onResize = throttle(250, () => update(true))
 
 		window.addEventListener('resize', onResize)
 		const clearResize = () => window.removeEventListener('resize', onResize)
