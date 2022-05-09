@@ -88,7 +88,7 @@ const mix = calc.getValueFromProgress
 const MY_RETINA_FIXING_MAGIC_NUMBER = 3
 
 const calcSnaps = (dom: HTMLDivElement) => {
-	if (dom === null || typeof dom === 'undefined') return null
+	if (!dom) return null
 	const pageWidth = dom.offsetWidth
 	const children = Array.from(
 		(dom.firstChild! as HTMLDivElement).children
