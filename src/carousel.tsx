@@ -38,7 +38,7 @@ type Snaps = {pages: Array<number>; elements: Array<number>}
 
 export const useCarousel = (options?: CarouselOptions) => {
 	const [, gen] = useState(0)
-	const forceUpdate = useCallback(() => gen(x => x + 1), [gen])
+	const forceUpdate = useCallback(() => gen((x) => x + 1), [gen])
 	const [current, setCurrent] = useState(0)
 	const [total, setTotal] = useState(0)
 	const target = useRef(0)
@@ -63,7 +63,7 @@ export const useCarousel = (options?: CarouselOptions) => {
 	const goPrevious = () => goTo(current - 1)
 	return {
 		current,
-		setCurrent: current => {
+		setCurrent: (current) => {
 			setCurrent(current)
 			forceUpdate()
 		},
@@ -88,6 +88,7 @@ const mix = calc.getValueFromProgress
 const MY_RETINA_FIXING_MAGIC_NUMBER = 3
 
 const calcSnaps = (dom: HTMLDivElement) => {
+	if (!dom) return null
 	const pageWidth = dom.offsetWidth
 	const children = Array.from(
 		(dom.firstChild! as HTMLDivElement).children
@@ -173,6 +174,7 @@ export const Carousel: FunctionComponent<
 	const update = useCallback((force?: boolean) => {
 		const snaps = snapsRef.current
 		const newSnaps = calcSnaps(dom.current!)
+		if (!newSnaps) return
 		if (!force && snapKey(snaps) === snapKey(newSnaps)) return
 		setTotal(Math.ceil(newSnaps.pages.length))
 		snapsRef.current = newSnaps
@@ -260,10 +262,7 @@ export const Carousel: FunctionComponent<
 					x: start,
 					preventDefault: false
 				})
-					.pipe(
-						(pos: {x: number}) => pos.x,
-						overDrag
-					)
+					.pipe((pos: {x: number}) => pos.x, overDrag)
 					.start(offset).stop
 				listen(document, 'mouseup touchend', {once: true}).start(() =>
 					snapToPoint(start)
@@ -353,7 +352,7 @@ export const Carousel: FunctionComponent<
 		>
 			<div
 				style={{height: '100%', display: 'flex'}}
-				onDragStart={e => e.preventDefault()}
+				onDragStart={(e) => e.preventDefault()}
 			>
 				{children}
 			</div>
