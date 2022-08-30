@@ -1,6 +1,7 @@
 import {calc, listen, pointer, spring, styler, value} from 'popmotion'
 import React, {
 	FunctionComponent,
+	PropsWithChildren,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -24,7 +25,7 @@ type CarouselOptions = {
 type SlidePosition = undefined | 'left' | 'active' | 'right'
 type GetPosition = (page: number, childIndex: number) => SlidePosition
 
-type Carousel = {
+type Carousel = PropsWithChildren<{
 	current: number
 	setCurrent: (page: number) => void
 	total: number
@@ -32,7 +33,7 @@ type Carousel = {
 	isActive: (childIndex: number) => boolean
 	getPosition: (childIndex: number) => SlidePosition
 	setGetPosition: (update: () => GetPosition) => void
-} & CarouselOptions
+} & CarouselOptions>
 
 type Snaps = {pages: Array<number>; elements: Array<number>}
 
